@@ -1,0 +1,36 @@
+% Packages
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{forest}
+\usepackage[]{multicol}
+
+
+\forestset{
+dg edges/.style={for tree={parent anchor=south, child anchor=north,align=center,base=bottom,where n children=0{tier=word,edge=dotted,calign with current edge}{}}},
+}
+% \usetikzlibrary{automata, arrows.meta, positioning,shapes}
+
+\numberwithin{equation}{subsection}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+% \renewcommand{\thesubsubsection}{\Alph{subsubsection}}
+
+\newcommand{\setsubsubsectionnumber}[1]{\setcounter{subsubsection}{#1}\addtocounter{subsubsection}{-1}}
+
+\DeclareMathOperator{\putx}{put}
+
+\makeatletter
+\newcommand{\leqnomode}{\tagsleft@true}
+\newcommand{\reqnomode}{\tagsleft@false}
+\makeatother
+
+\newcommand{\abs}[1]{\vert #1\vert}
+\newcommand{\tab}[1][30pt]{\hspace*{#1}}
+\newcommand{\bracket}[1]{\biggl[#1\biggr]}
