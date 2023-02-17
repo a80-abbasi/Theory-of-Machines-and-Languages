@@ -1,0 +1,545 @@
+\documentclass{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage[colorlinks=true]{hyperref}
+% \usetikzlibrary{automata, arrows.meta, positioning,shapes}
+
+\numberwithin{equation}{subsection}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\Alph{subsubsection}}
+
+\newcommand{\setsubsubsectionnumber}[1]{\setcounter{subsubsection}{#1}\addtocounter{subsubsection}{-1}}
+
+\DeclareMathOperator{\putx}{put}
+
+\makeatletter
+\newcommand{\leqnomode}{\tagsleft@true}
+\newcommand{\reqnomode}{\tagsleft@false}
+\makeatother
+
+\newcommand{\abs}[1]{\vert #1\vert}
+\newcommand{\tab}[1][30pt]{\hspace*{#1}}
+\newcommand{\bracket}[1]{\biggl[#1\biggr]}
+
+
+\title{Automata Homework 2}
+\author{Ali Abbasi -- 98105879}
+\begin{document}
+\maketitle
+\tableofcontents
+\pagebreak
+
+\section{Description of Automata and Concepts of Regular Languages}
+\subsection{}
+\subsubsection{}
+We want to design an automaton that recognizes the language of strings over \(\{0, 1\}\) that their binary representation's remainder in division by \(5\) is \(2\).\\
+Assume that we have an automaton that string \(s\) ends up in the state \(k\), if remainder of the binary representation of \(s\) in division by \(5\) is \(k\).
+Now we derive the transition function of this automaton.
+Assume that after reading the string \(s\), the next character is \(a\).
+So our new string is \(s\circ a\). 
+We can calculate the remainder of this new string divided by \(5\) as follows:
+\begin{align}
+s\circ a \mod 5 &= s\circ 0 + a \mod 5\\
+&= 2s + a \mod 5\\
+&= 2k + a \mod 5\\
+\end{align}
+Where \(k\) is the remainder of \(s\) in division by \(5\).
+So we have:
+\begin{align}
+\delta(k, a) &= 2k + a \mod 5
+\end{align}
+The DFA for this automaton is shown in Figure~\ref{fig:automata1-1-1}.
+\begin{figure}[H]
+\centering
+\input{automata1-1-1.tex}
+\caption{DFA describing the language.}
+\label{fig:automata1-1-1}
+\end{figure}
+
+\subsubsection{}
+First we design the NFA that recognizes the language of all strings with minimum size of 4 over the alphabet $\{a,b\}$ that their first and second to last letters are different.
+The NFA is shown in Figure~\ref{fig:automata1-1-2-a}.
+\begin{figure}[H]
+\centering
+\input{automata1-1-2-a.tex}
+\caption{NFA describing the language.}
+\label{fig:automata1-1-2-a}
+\end{figure}
+The NFA first gets \(a\) or \(b\) and gets one or more arbitrary characters.
+When it reaches to the last two characters, it expects to get a different character than the first two characters.
+Then it gets another arbitrary character and accept state is reached.
+Note that state \(1\) and \(2\) are introduced only to make the minimum length of strings in this language 4.\\
+Then we convert the NFA to an equivalent DFA using the subset construction algorithm.
+The DFA is shown in Figure~\ref{fig:automata1-1-2-b}.
+\begin{figure}[H]
+\centering
+\input{automata1-1-2-b.tex}
+\caption{The Equivalent DFA describing the language.}
+\label{fig:automata1-1-2-b}
+\end{figure}
+
+\subsection{}
+\(D\) possibly has multiple accept states.
+DFA \(D'\) will have the same structure as \(D\), and accept states that are subset of the those of \(D\).
+Think of DFA \(D\) as a graph with states as nodes and transitions as edges.
+If an accept state in \(D\) (for example \(f_1\)), has a path to another accept state (\(f_2\)), then for all \(w\) accepted via \(f_1\), there is a non-empty string \(x\) such that \(w x\) is accepted via \(f_2\).
+In this case we remove \(f_1\) from the accept states of \(D'\).
+Using DFAs notation, we have:
+\begin{align}
+D &= (Q, \Sigma, \delta, q_0, F)\\
+\implies D' &= (Q, \Sigma, \delta, q_0, F')\\
+\text{where } F' &= \left\{f \in F | \forall f' \in F, \text{ there is no path from } f \text{ to } f' \right\}
+\end{align}
+
+\subsection{}
+\subsubsection{}
+\begin{align}
+\begin{rcases*}
+g\circ f (q_{0,1}) = g (q_{0,2}) = q_{0,3} \\
+g\circ f(\delta_1 (q, a)) = g(\delta_2(f(q), a)) = \delta_3(g\circ f(q), a)
+\end{rcases*} \implies g\circ f: Q_1\to Q_3 \text{ is a morphism.}
+\end{align}
+
+\subsubsection{}
+We prove this by induction on the length of the string.
+Suppose \(w=w_1w_2\cdots w_n\).
+We have:\\
+\textbf{Base Case:} \(n=1\):\\
+\begin{align}
+h(\delta_1(q, w_1)) &= \delta_2(h(q), w_1)
+\end{align}
+\textbf{Induction Hypothesis:} Suppose it holds for \(n=k\). Then:
+\begin{align}
+w_{1:k} &\triangleq w_1w_2\cdots w_k\\
+h(\delta_1^*(q, w_{1:k})) &= \delta_2^*(h(q), w_{1:k})
+\end{align}
+\textbf{Inductive Step:}
+\begin{align}
+h(\delta_1^*(q, w_{1:k+1})) &= h(\delta_1(\delta_1^*(q, w_{1:k}), w_{k+1}))\\
+&= \delta_2(h(\delta_1^*(q, w_{1:k})), w_{k+1})\\
+&= \delta_2(\delta_2^*(h(q), w_{1:k}), w_{k+1}) & (\text{Induction Hypothesis})\\
+&= \delta_2^*(h(q), w_{1:k+1})
+\end{align}
+So it holds for all \(w \in \Sigma^*\) with length \(n>0\)
+(Note that \(\delta(q, \epsilon)\) is undefined for DFA).
+
+\section{Equivalence and Minimization}
+\subsection{}
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c|c}
+q & \(\delta(q, a)\) & \(\delta(q, b)\)\\
+\hline
+01 & 234 & \(\emptyset\)\\
+234 & 014 & 0134\\
+014 & 234 & \(\emptyset\)\\
+0134 & 01234 & 014\\
+01234 & 01234 & 0134\\
+\(\emptyset\) & \(\emptyset\) & \(\emptyset\)
+\end{tabular}
+\caption{States and transition functions of the equivalent DFA}
+\end{table}
+Each state of the DFA is a subset of NFA's states.
+And if it contains the accept state of NFA (4), it is an accept state of DFA.
+Introducing new names for brevity:
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c|c}
+q & \(\delta(q, a)\) & \(\delta(q, b)\)\\
+\hline
+A & B & F\\
+B & C & D\\
+C & B & F\\
+D & E & C\\
+E & E & D\\
+F & F & F
+\end{tabular}
+\caption{States and transition functions of the DFA}
+\end{table}
+\begin{figure}[H]
+\centering
+\input{automata2-1.tex}
+\caption{The Equivalent DFA.}
+\label{fig:automata2-1}
+\end{figure}
+
+\subsection{}
+Note that both accept states of DFA are unreachable!
+So we can remove them and the transitions to them.
+And the Hopcroft algorithm ends in the first step, since all remaining states are in one class.
+So the minimized DFA is a single non-accept state.
+\begin{figure}[H]
+\centering
+\input{automata2-2.tex}
+\caption{The minimized DFA!}
+\label{fig:automata2-2}
+\end{figure}
+
+\section{Regular Expressions and Grammars}
+\subsection{}
+\subsubsection{}
+First we design DFA describing \((a\cup b)^*\) language using the rules we learned.
+Then we simplify it with removing extra \(\epsilon\) transitions (Figure~\ref{fig:automata3-1-a}).
+\begin{figure}[H]
+\centering
+\input{automata3-1-a.tex}
+\caption{DFA for \((a\cup b)^*\).}
+\label{fig:automata3-1-a}
+\end{figure}
+Now we design DFA for \((a\cup b)^*(a\cup ba)^*a(b\cup ab)^*\) in the same way (Figure~\ref{fig:automata3-1-b}).
+\begin{figure}[H]
+\centering
+\input{automata3-1-b.tex}
+\caption{DFA for \((a\cup b)^*(a\cup ba)^*a(b\cup ab)^*\).}
+\label{fig:automata3-1-b}
+\end{figure}
+
+\subsubsection{}
+Using the same method as last part, we derive the following DFA for this language (Figure~\ref{fig:automata3-1-c}).
+\begin{figure}[H]
+\centering
+\input{automata3-1-c.tex}
+\caption{DFA for \((ab\cup ba^*b^*)^*(b^*abb)^*\).}
+\label{fig:automata3-1-c}
+\end{figure}
+
+\subsection{}
+\subsubsection{}
+First we convert the DFA to GNFA.
+Then we rip the GNFA states one by one, to get the regular expression (Figure~\ref{fig:automata3-2-1}).\\
+Note that to avoid overcrowding the figure, we do not draw the arrows with \(\emptyset\) labels.
+\begin{figure}
+\centering  
+\begin{subfigure}[b]{\textwidth}
+\centering
+\input{automata3-2-a.tex}
+\subcaption{The initial GNFA.}
+\end{subfigure}
+
+\medskip
+\begin{subfigure}[b]{\textwidth}
+\centering
+\input{automata3-2-b.tex}
+\subcaption{After ripping \(1\).}
+\end{subfigure}
+
+\medskip
+\begin{subfigure}[b]{\textwidth}
+\centering
+\input{automata3-2-c.tex}
+\subcaption{After ripping \(2\).}
+\end{subfigure}
+
+\medskip
+\begin{subfigure}[b]{\textwidth}
+\centering
+\input{automata3-2-d.tex}
+\subcaption{After ripping \(4\).}
+\end{subfigure}
+
+\medskip
+\caption{Converting DFA to Regular Expression.}
+\label{fig:automata3-2-1}
+\end{figure}%
+\begin{figure}[t]\ContinuedFloat
+\centering  
+\begin{subfigure}[t]{\textwidth}
+\centering
+\input{automata3-2-e.tex}
+\subcaption{After ripping \(3\) (\(b\cup ab \cup b(\epsilon \cup ab) = b\cup ab \cup bab\)).}
+\end{subfigure}
+
+\medskip
+\begin{subfigure}[t]{\textwidth}
+\centering
+\input{automata3-2-f.tex}
+\subcaption{After ripping \(5\).}
+\end{subfigure}
+
+\medskip
+\caption{Converting DFA to Regular Expression. (Continued)}
+\end{figure}
+
+\pagebreak
+So the resulting regular expression is \((a\cup b)b(\epsilon\cup ab)(b\cup ab \cup bab)^*\).
+
+\subsubsection{}
+Using the same procedure as last part, we can get the corresponding regular expression (Figure~\ref{fig:automata3-2-2}).
+\begin{figure}
+\centering  
+\begin{subfigure}[b]{\textwidth}
+\centering
+\input{automata3-2-2-a.tex}
+\subcaption{The initial GNFA.}
+\end{subfigure}
+
+\medskip
+\centering  
+\begin{subfigure}[b]{\textwidth}
+\centering
+\input{automata3-2-2-b.tex}
+\subcaption{After ripping \(1\).}
+\end{subfigure}
+
+\medskip
+\begin{subfigure}[b]{\textwidth}
+\centering
+\input{automata3-2-2-c.tex}
+\subcaption{After ripping \(3\).}
+\end{subfigure}
+
+\medskip
+\begin{subfigure}[b]{\textwidth}
+\centering
+\input{automata3-2-2-d.tex}
+\subcaption{After ripping \(4\).}
+\end{subfigure}
+
+\medskip
+\begin{subfigure}[b]{\textwidth}
+\centering
+\input{automata3-2-2-e.tex}
+\subcaption{After ripping \(2\).}
+\end{subfigure}
+\caption{Converting DFA to Regular Expression.}
+\label{fig:automata3-2-2}
+\end{figure}
+
+\pagebreak
+So the resulting regular expression is \((a\cup b)(b\cup (b\cup c)(a\cup b)\cup (b\cup c)cb)^*((b\cup c)c\cup \epsilon)\).
+\subsection{}
+\subsubsection{}
+We know:
+\begin{align}
+\begin{rcases*}
+x \in x^*\\
+y \in yx^*
+\end{rcases*}
+\implies (x\cup y) \subseteq (x^*\cup yx^*) \implies (x\cup y)^* \subseteq (x^*\cup yx^*)^*
+\end{align}
+and also we know that \((x\cup y)^*\) is language of all strings of arbitrary length over the alphabet \(\{a, b\}\).
+So:
+\begin{align}
+    (x^*\cup yx^*)^* \subseteq (x\cup y)^* 
+\end{align}
+Thus we have:
+\begin{align}
+    (x\cup y)^* = (x^*\cup yx^*)^*
+\end{align}
+\subsubsection{}
+We use result of the last part:
+\begin{align}
+(y^*(x\cup \epsilon) y^*)^* &= (y^*xy^* \cup y^* y^*)^*\\
+&= (y^*xy^* \cup y^*)^*\\
+&= (y^* \cup y^*xy^*)^*\\
+\xrightarrow{b = y, a = y^*x}&= (b^* \cup ab^*)^*\\
+&= (b \cup a)^* & \text{using the last part}\\
+&= (y \cup y^*x)^*
+\end{align}
+Again using the same reasoning as last part, we can get:
+\begin{gather}
+\begin{rcases*}
+x \in y^*x \implies (y \cup x) \subseteq (y \cup y^*x) \implies (y \cup x)^* \subseteq (y \cup y^*x)^*\\
+(y \cup y^*x)^* \subseteq \text{language of all strings over \(\{a, b\}\)} \implies (y \cup x)^* \subseteq (y \cup x)^*
+\end{rcases*}\\
+\implies (y^*(x\cup \epsilon) y^*)^* = (y \cup y^*x)^* = (y \cup x)^* = (x\cup y)^*
+\end{gather}
+
+\subsection{}
+\subsubsection{}
+We know that \(A\) generates strings of arbitrary length containing \(a\) (i.e. \(a^*\)).
+So strings generated by \(S\) are of the form \(a^*(a^*ba^*b)^*b\).
+And language of this regex can be described by the following NFA (Figure~\ref{fig:automata3-4-a}).
+\begin{figure}[H]
+\centering
+\input{automata3-4-a.tex}
+\caption{DFA for the regex \(a^*(a^*ba^*b)^*b\).}
+\label{fig:automata3-4-a}
+\end{figure}
+And we can convert this NFA to a left-linear grammar easily.
+\begin{equation}
+\begin{aligned}
+    S &\rightarrow aS \mid X\\
+    X &\rightarrow Y \mid b\\
+    Y &\rightarrow aY \mid bZ\\
+    Z &\rightarrow  aZ \mid b X
+\end{aligned}
+\end{equation}
+
+\subsubsection{}
+If we examine this grammar carefully, we can see that it describes language of strings with even number of \(a\)s (because either \(S\Rightarrow B\) and \(S\) has no \(a\)s, or \(S\Rightarrow AA\), where each time using \(A\to AAA\) rule, adds 2 \(a\)s to the string).
+So we can design the following DFA (Figure~\ref{fig:automata3-4-b}) to recognize this language.
+\begin{figure}[H]
+\centering
+\input{automata3-4-b.tex}
+\caption{DFA for the language of strings with even number of \(a\)s.}
+\label{fig:automata3-4-b}
+\end{figure}
+The equivalent left-linear grammar is:
+\begin{equation}
+\begin{aligned}
+S &\rightarrow bS \mid aX \mid \epsilon\\    
+X &\rightarrow bX \mid aS
+\end{aligned}
+\end{equation}
+
+\section{Closure Properties of Regular Languages}
+\subsection{}
+We design a NFA which recognizes the language of \(\putx(L, x)\) (i.e., \(D_2\)) using the NFA of \(L\) (i.e., \(D\)).
+The main idea is to duplicate every state and transition of \(D\) and add a new transition from every state of \(D\) to their corresponding duplicate state, accepting the input \(x\)
+(for brevity, here we assume that our new transitions can input a string of arbitrary length, instead of a single character).
+And finally, only the duplicate of the final state of \(D\) will be accepting states.
+Doing so, we the read inputs and proceed in the initial NFA, \(D\).
+As soon as \(x\) is read, we switch to the duplicate of the current state and proceed in the duplicate NFA until we reach its final state.
+We can show this procedure formally as follows:
+\begin{align}
+D = (Q, \Sigma, \delta, q_0, F)
+\end{align}
+We denote the corresponding state of \(q\) as \(q'\).
+\begin{align}
+D_2 = (Q_2, \Sigma, \delta_2, q_0, F')
+\end{align}
+where:
+\begin{gather}
+Q' \triangleq \bigcup_{q \in Q} \{q'\} \quad \text{and} \quad F' \triangleq \bigcup_{q \in F}\{q'\}\\
+Q_2 = Q \cup Q'\\
+\delta_2(s, a) =
+\begin{cases}
+\delta(q, a) & \text{if } s=q \in Q \text{ and \(a\neq x\)}\\
+\delta(q, a)\cup \{q'\} & \text{if } s=q \in Q \text{ and \(a=x\)}\\
+\delta'(q, a)  & \text{if } s=q' \in Q'
+\end{cases}
+\end{gather}
+Clarifying using an example: \(L=\) all strings over \(\{a, b\}\) with even number of \(a\)s.
+\begin{figure}[H]
+\centering
+\begin{subfigure}[]{0.45\textwidth}
+\centering
+\input{automata4-1.tex}
+\caption{\(D\).}
+\label{fig:automata4-1}
+\end{subfigure}
+\(\implies\)
+\begin{subfigure}[]{0.45\textwidth}
+\centering
+\input{automata4-1-b.tex}
+\caption{\(D_2\).}
+\label{fig:automata4-1-b}
+\end{subfigure}
+\end{figure}
+And \(D_2\) describes \(\putx(L, x)\).
+
+\subsection{}
+We will first solve part~\ref{sec:subsubsection4-2}.
+\setsubsubsectionnumber{2}
+\subsubsection{}\label{sec:subsubsection4-2}
+We want to prove that if \(L\) is a regular language, \(\textup{SQRT}(L) = \left\{x \mid \exists y:\ \abs{y}=\abs{x}^2, xy\in L\right\}\) is a regular language.\\
+Assume the DFA recognizing \(L\) is \(D = (Q, \Sigma, \delta, q_0, F)\).\\
+We define \(\mathcal{G}\) to be the set of all functions from \(Q\) to \(\mathcal{P}(Q)\) (power-set of \(Q\)). 
+And for any \(f, g \in \mathcal{G}\), we define \(f \circ g\) as follows:
+\begin{align}
+f \circ g(q) = \bigcup_{q' \in g(q)} f(q')
+\end{align}
+Construct the new DFA \(D'\) recognizing \(\textup{SQRT}(L)\) as follows:
+\begin{align}
+D' &= (Q', \Sigma, \delta', q_0', F')\\
+Q' &= Q \times \mathcal{G}^2\\
+\delta'((q, g_1, g_2), a) &= \Big(\delta(q, a), g_1\circ g_0, ((g_2\circ g_1)\circ g_1)\circ g_0\Big)\\
+\text{Where }g_0(q) &= \left\{\delta(q, a)\mid a \in \Sigma\right\}\\
+q_0' &= (q_0, I, I)\\
+\text{Where }I(q) &= \left\{q\right\}\\
+F' &= \left\{(q, g_1, g_2) \in Q\times \mathcal{G}^2 \mid g_2(q) \cap F \neq \emptyset\right\}
+\end{align}
+In this new DFA, after reading a word \(w\), if \(D\) reaches state \(q\), then \(D'\) reaches the state \((q, g_1, g_2)\) where \(g_1(.)\) and \(g_2(.)\) represent the set of states of \(D\) that can be reached starting at \(.\) then reading a string of length \(\abs{w}\) and \(\abs{w}^2\) respectively.
+This can be proved using induction on strings of length \(n\).
+When \(n=0\) (no character is read), \(g_1(.)\) and \(g_2(.)\) are contain only \(.\) state.\\
+If our claim holds for strings of length \(n=k\), we have:
+\begin{align}
+\delta'(q_0', w) &= (q, g_1, g_2) \tab \forall w: \abs{w}=k\\
+g_1(.) &= \left\{\text{all states reachable from \(.\) with \(k\) steps}\right\}\\
+g_2(.) &= \left\{\text{all states reachable from \(.\) with \(k^2\) steps}\right\}\\
+g_0(.) &= \left\{\delta(. , a)\mid a \in \Sigma\right\}\\
+\implies g_0(.) & = \left\{\text{all states reachable from \(.\) with \(1\) step}\right\}\\
+\text{Now for \(n=k+1\), we have:}\tag*{}\\
+\forall a \in \Sigma: \delta'((q, g_1, g_2), a) &= \Big(\delta(q, a), g_1\circ g_0, ((g_2\circ g_1)\circ g_1)\circ g_0\Big)\\
+\implies g_1\circ g_0(.) &= \left\{\text{all states reachable from \(.\) with \(k+1\) steps}\right\}\\
+\text{and } ((g_2\circ g_1)\circ g_1)\circ g_0 &= \{\text{all states reachable from \(.\) with \(\underbrace{k^2 + k + k + 1}_{=(k+1)^2}\) steps}\}
+\end{align}
+Thus we have proved our claim.
+And we have designed a DFA \(D'\) recognizing \(\textup{SQRT}(L)\).
+So \(\textup{SQRT}(L)\) is a regular language.
+
+\setsubsubsectionnumber{1}
+\subsubsection{}
+A similar argument can be used to prove this part.
+This time we use functions in \(\mathcal{G}\) to keep track of length of strings in \(B\).
+\begin{align}
+A, B \text{ are regular} \implies \textup{C}(A, B) = \left\{x\in A \mid \exists y:\ \abs{y}=\abs{x}^2, y \in B \right\} \text{ is regular}
+\end{align}
+There exists DFAs \(D_A\) and \(D_B\) recognizing \(A\) and \(B\) respectively.
+We design a DFA \(D_C\) recognizing \(\textup{C}(A, B)\) as follows:
+\begin{align}
+D_A &= (Q_A, \Sigma, \delta_A, q_{0, A}, F_A)\\
+D_B &= (Q_B, \Sigma, \delta_B, q_{0, B}, F_B)\\
+D_C &= (Q_C, \Sigma, \delta_C, q_{0, C}, F_C)\\
+\text{Where: }Q_C &= Q_A \times \mathcal{G}^2\\
+\delta_C((q, g_1, g_2), a) &= \Big(\delta_A(q, a), g_1\circ g_0, ((g_2\circ g_1)\circ g_1)\circ g_0\Big)\\
+\text{Where }g_0(.) &= \left\{\delta_B(q, .)\mid a \in \Sigma\right\}\\
+q_{0, C} &= (q_{0, A}, I, I)\\
+\text{Where }I(.) &= \left\{.\right\}\\
+F_C &= \left\{(q, g_1, g_2) \in Q_A\times \mathcal{G}^2 \mid q\in F_A \text{ and } g_2(q_{0,B}) \cap F_B \neq \emptyset\right\}
+\end{align}
+
+\section{Proving Non-Regularity of Languages}
+\subsection{}
+\subsubsection{}
+Proof by contradiction.
+Assume \(L_1\) is a regular language and its pumping length is \(p\).
+Consider the string \(w = a^pb^{p!+p}c^{p!+p}\).
+Because \(w\) is a member of \(L_1\) and has length more than \(p\), the pumping lemma guarantees that \(w\) can be split into three pieces, \(w = xyz\), satisfying the lemma conditions.
+We know that \(\vert xy\vert \le p\) and \(\vert y\vert \ge 1\).
+So \(x\) and \(y\) contain only \(a\)s.
+Pumping this strings we get:
+\begin{gather}
+xy^iz \in L_1 \quad \text{for all } i \in \mathbb{N}.
+\end{gather}
+If we take \(y\)'s length to be \(k\), number of \(a\)s in \(xy^iz\) will be \(p-k+ki\).
+And we can find an \(i\) such that the number of \(a\)s, \(b\)s, and \(c\)s are equal in \(xy^iz\).
+\begin{align}
+&p - k + ki = p! + p\\
+\implies & k(i-1) = p!\\
+\xrightarrow{k \le p \implies k|p!} & i = \frac{p!}{k}+1
+\end{align}
+So the string \(a^{p!+p}b^{p!+p}c^{p!+p}\) can be achieved by pumping \(a^pb^{p!+p}c^{p!+p}\), but it is not a member of \(L_1\).
+So we have reached a contradiction and \(L_1\) is not a regular language.
+
+\subsubsection{}
+Assume \(L_2\) is a regular language, \(p\) is its pumping length and \(r\) is the smallest prime number such that \(p \le r\).
+Consider the string \(a^{2r}\).
+The pumping lemma guarantees that this string can be split into three pieces, \(a^{2r} = xyz\), satisfying the lemma conditions.
+Assuming \(y\)'s length to be \(k\), we have:
+\begin{align}
+\abs{xy^iz} = 2r - k + ik = 2r + (i-1)k \text{ is product of two prime numbers.}
+\end{align}
+For odd values of \(i\) we have:
+\begin{align}
+&i = 2j + 1\\
+\implies & 2r + (2j)k = 2(r + jk) \text{ is product of two prime numbers.}\\
+\implies & r + jk \text{ is a prime number.}
+\end{align}
+So we have a linear pattern for generating prime numbers larger than \(r\)!
+And we know that there is no such pattern.
+So we have reached a contradiction and \(L_2\) is not a regular language.
+
+\subsection{To Do}
+
+\end{document}
