@@ -1,0 +1,425 @@
+\documentclass{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{forest}
+
+
+\forestset{
+dg edges/.style={for tree={parent anchor=south, child anchor=north,align=center,base=bottom,where n children=0{tier=word,edge=dotted,calign with current edge}{}}},
+}
+% \usetikzlibrary{automata, arrows.meta, positioning,shapes}
+
+\numberwithin{equation}{subsection}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+% \renewcommand{\thesubsubsection}{\Alph{subsubsection}}
+
+\newcommand{\setsubsubsectionnumber}[1]{\setcounter{subsubsection}{#1}\addtocounter{subsubsection}{-1}}
+
+\DeclareMathOperator{\putx}{put}
+
+\makeatletter
+\newcommand{\leqnomode}{\tagsleft@true}
+\newcommand{\reqnomode}{\tagsleft@false}
+\makeatother
+
+\newcommand{\abs}[1]{\vert #1\vert}
+\newcommand{\tab}[1][30pt]{\hspace*{#1}}
+\newcommand{\bracket}[1]{\biggl[#1\biggr]}
+
+
+
+\title{Theory of Machines and Languages - Assignment 3}
+\author{Ali Abbasi - 98105879}
+\begin{document}
+\maketitle
+\tableofcontents
+\pagebreak
+
+\section{Context Free Grammars}
+\subsection{}
+\subsubsection{}
+A grammar describing the language is as follows:
+\begin{align*}
+S &\rightarrow bS \mid aA\\
+A &\rightarrow bA \mid aB\\
+B &\rightarrow bB \mid aC\\
+C &\rightarrow bC \mid aC \mid \epsilon
+\end{align*}
+
+\subsubsection{}
+\begin{align*}
+S &\rightarrow ASA \mid 0\\
+A &\rightarrow 0 \mid 1
+\end{align*}
+
+\subsection{}
+We can rewrite the language as follows:
+\begin{gather}
+L=\left\{a^ib^jc^k \mid i, j, k \ge 0, i=j\right\} \cup 
+\left\{a^ib^jc^k \mid i, j, k \ge 0, j=k\right\}
+\end{gather}
+So we have:
+\begin{align*}
+S &\rightarrow S_1 \mid S_2\\
+S_1 &\rightarrow XC\\
+C &\rightarrow cC \mid \epsilon\\
+X &\rightarrow a X b \mid \epsilon\\
+S_2 &\rightarrow AY\\
+A &\rightarrow aA \mid \epsilon\\
+Y &\rightarrow bYc \mid \epsilon
+\end{align*}
+Now consider the empty string (\(\epsilon\)).
+Since in this string \(i=j\) and \(j=k\) both hold, it can be derived with both rules \(S\rightarrow S_1\) and \(S\rightarrow S_2\).
+So this grammar is ambiguous.
+
+\subsection{}
+\subsubsection{}
+Rightmost derivation of \(bbab\):
+\begin{gather}
+S \Rightarrow ST \Rightarrow Sb \Rightarrow TSb \Rightarrow TTSb \Rightarrow TTab \Rightarrow Tbab \Rightarrow bbab
+\end{gather}
+So the derivation tree is:
+\begin{figure}[H]
+    \centering
+    \begin{forest}
+        dg edges
+        [S
+            [S
+                [T [b]]
+                [S
+                    [T [b]]
+                    [S [a]]]]
+            [T [b]]]
+        \end{forest}  
+\caption{Rightmost derivation tree for \(bbab\)}  
+\label{fig:derivation_tree1}
+\end{figure}
+
+\subsubsection{}
+\begin{gather}
+S \Rightarrow TS \Rightarrow bS \Rightarrow bTS \Rightarrow bbS\Rightarrow bbST \Rightarrow bbaT \Rightarrow bbab
+\end{gather}
+And the derivation tree is:
+\begin{figure}[H]
+\centering
+\begin{forest}
+dg edges
+[S
+    [T [b]]
+    [S
+        [T [b]]
+        [S
+            [S [a]]
+            [T [b]]]]]
+\end{forest}    
+\caption{Leftmost derivation tree for \(bbab\)}
+\end{figure}
+\subsubsection{}
+As we saw, the string \(bbab\) had two different derivation trees
+(we can reach the tree in Fig.~\ref{fig:derivation_tree1} by using leftmost derivations too.
+So this string has two leftmost derivations).
+Hence, this grammar is ambiguous.
+The reason behind this is that it has two choices in some steps to generate \(b\)s around the \(a\).
+\subsubsection{}
+We can convert it to a unambiguous grammar as follows:
+\begin{align*}
+S &\rightarrow TaT\\
+T &\rightarrow bT \mid \epsilon
+\end{align*}
+
+
+\subsection{}
+Add new start variable:
+\begin{equation}
+\begin{aligned}
+S_0 &\rightarrow S\\
+S &\rightarrow ASB\\
+A &\rightarrow aASA \mid a \mid \epsilon\\
+B &\rightarrow SbS \mid A \mid bb
+\end{aligned}
+\end{equation}
+Remove \(A \rightarrow \epsilon\):
+\begin{equation}
+\begin{aligned}
+    S_0 &\rightarrow S\\
+    S &\rightarrow ASB \mid SB\\
+    A &\rightarrow aASA \mid a \mid aSA \mid aAS \mid aS\\
+    B &\rightarrow SbS \mid A \mid bb \mid \epsilon
+    \end{aligned}
+\end{equation}
+Remove \(B \rightarrow \epsilon\):
+\begin{equation}
+\begin{aligned}
+    S_0 &\rightarrow S\\
+    S &\rightarrow ASB \mid SB \mid S \mid AS\\
+    A &\rightarrow aASA \mid a \mid aSA \mid aAS \mid aS\\
+    B &\rightarrow SbS \mid A \mid bb
+    \end{aligned}
+\end{equation}
+Remove \(S \rightarrow S\), \(S_0 \rightarrow S\), and \(B \rightarrow A\):
+\begin{equation}
+\begin{aligned}
+S_0 &\rightarrow ASB \mid SB \mid AS\\
+S &\rightarrow ASB \mid SB \mid AS\\
+A &\rightarrow aASA \mid a \mid aSA \mid aAS \mid aS\\
+B &\rightarrow SbS \mid A \mid bb \mid aASA \mid a \mid aSA \mid aAS \mid aS
+\end{aligned}
+\end{equation}
+And finally, we convert all the remaining rules into the proper form.
+\begin{equation}
+\begin{aligned}
+S_0 &\rightarrow AX \mid SB \mid AS\\
+X &\rightarrow SB\\
+S &\rightarrow AX \mid SB \mid AS\\
+A &\rightarrow UY \mid a \mid UZ \mid UW \mid US\\
+U &\rightarrow a\\
+Y &\rightarrow AZ\\
+Z &\rightarrow SA\\
+W &\rightarrow AS\\
+B &\rightarrow SK \mid VV \mid UY \mid a \mid UZ \mid UW \mid US\\
+K &\rightarrow VS\\
+V &\rightarrow b
+\end{aligned}
+\end{equation}
+
+\subsection{To Do}
+
+\section{Closure Properties of Context-Free Languages}
+\subsection{}
+Suppose that \(L_1\) and \(L_2\) are two context-free languages.
+So there are CFGs that describe these languages, e.g. \(G_1\) and \(G_2\).
+Then we can create a CFG that describes the concatenation of these languages as follows:
+\begin{align*}
+G_1 &= (V_1, \Sigma, R_1, S_1)\\
+G_2 &= (V_2, \Sigma, R_2, S_2)\\
+\implies G_3 &= (V_1 \cup V_2 \cup \{S\}, \Sigma, R_1 \cup R_2 \cup \{S \rightarrow S_1S_2\}, S)
+\end{align*}
+And \(G_3\) describes the concatenation of \(L_1\) and \(L_2\).
+So the concatenation of two context-free languages is also context-free.
+
+\subsection{}
+First we convert the grammar of \(L\) to the Chomsky normal form. Then we convert this grammar (\(G\)) to a new grammar that recognizes the language \(PREFIX(L)\), proving that \(PREFIX(L)\) is context-free.
+\begin{align*}
+G &= (V, \Sigma, R, S)\\
+\implies G_2 &= (V_2, \Sigma, R_2, S_\epsilon)\\
+\text{Where } V_2 &= V \cup \left[\bigcup_{A \in V} \{A_\epsilon\}\right]\\
+R_2 &= R \cup \left[\bigcup_{A\rightarrow BC \in R} \{A_\epsilon \rightarrow BC_\epsilon, A_\epsilon \rightarrow B_\epsilon\}\right] \cup \left[\bigcup_{A \rightarrow a \in R} \{A_\epsilon \rightarrow a\}\right] \cup \left[\bigcup_{A \in V} \{A_\epsilon \rightarrow \epsilon\}\right]
+\end{align*}
+For each \(A\) in the variables, we add a new variable \(A_\epsilon\), where \(A_\epsilon\) is nullable.
+Then for each rule \(A \rightarrow BC\), we add two new rules: \(A_\epsilon \rightarrow BC_\epsilon\) and \(A_\epsilon \rightarrow B_\epsilon\). 
+And also for we copy all rules generating terminals (like \(A \rightarrow a\)) for the new variables too (\(A_\epsilon \rightarrow a\)).
+And we set \(S_\epsilon\) to be the start variable.\\
+This way, if you consider the leftmost derivation of any string in \(L\), if we start from \(S_\epsilon\) instead of \(S\), then at each step of the derivation there is a \(\epsilon\) variable at the end of the string, where we can end the derivation right there by using the epsilon rule of that variable to get one of the strings in \(PREFIX(L)\), or act as before and proceed further.
+
+\section{Pushdown Automata}
+\subsection{}
+\subsubsection{}
+\begin{figure}[H]
+\centering
+\input{automata3-1.tex}
+\caption{Pushdown automata for the language \(L=\left\{a^nb^mc^m\mid n, m \in \mathbb{N}\right\}\).}
+\label{fig:automata3-1}
+\end{figure}
+
+\subsubsection{}
+\begin{figure}[H]
+\centering
+\input{automata3-1-2.tex}
+\caption{Pushdown automata for the language \(\left\{a^ib^jc^k\mid i,j,k\in \mathbb{N}, i+k=j\right\}\)}
+\label{fig:automata3-1-2}
+\end{figure}
+
+\subsubsection{}
+\begin{figure}[H]
+\centering
+\input{automata3-1-3.tex}
+\caption{Pushdown automata for the language \(\left\{w\in\{a,b\}^*\mid n_a(w)=2n_b(w)\right\}\)}
+\label{fig:automata3-1-3}
+\end{figure}
+Reading each \(b\) either pushes two \(b\)s to the stack or pops an \(a\) and adds a \(b\) to the stack.
+Reading each \(a\) either pushes and \(a\) to or pops a \(b\) from the stack.
+
+\subsection{}
+\begin{figure}[H]
+\centering
+\input{automata3-2.tex}
+\caption{Pushdown automata for the grammar.}
+\label{fig:automata3-2}
+\end{figure}
+
+\subsection{To Do}
+
+\section{Pumping Lemma for Context-Free Languages}
+\subsection{}
+Suppose it holds.
+Consider the language \(L=\left\{a^nb^mc^md^{3n}\mid m,n \ge 1\right\}\).
+\(L\) is context-free, since there is a CFG describing it:
+\begin{align*}
+S &\to aSddd \mid aTddd\\
+T &\to bTc \mid bc
+\end{align*}
+So \(L_{1/2}\) will be as follows:
+\begin{align*}
+L_{1/2}&=
+\begin{cases}
+a^nb^mc^n & m\ge n\\
+a^nb^mc^md^{n-m} & m<n
+\end{cases} & m,n\ge 1
+\end{align*}
+Suppose its pumping length is \(p\).
+Let \(s=a^pb^pc^p\) and \(s\in L_{1/2}\).
+As its length is more than \(p\), \(a^pb^pc^p\) must be pumped.
+But we can show it cannot be pumped.
+\begin{align*}
+\exists u,v,x,y,z:
+\begin{cases}
+a^pb^pc^p = uvxyz&\\
+uv^ixy^iz\in L_{1/2} & i\ge 0\\
+\abs{vxy} \le p&\\
+\abs{vy} > 0&
+\end{cases}
+\end{align*}
+Consider two cases below:
+\begin{itemize}
+\item Either \(v\) or \(y\) contains more than one type of symbol, the order of symbols in \(uv^2xy^2z\) will not be in the correct order.
+\item Both \(v\) and \(y\) have only one type of alphabet.
+There can be 3 cases:
+\begin{itemize}
+\item \(v\) and \(y\) both contain only \(a\) or both contain only \(c\).
+In this case, number of \(a\)s and \(c\)s in \(uv^2xy^2z\) will not be equal and it will not be in the language.
+\item \(v\) and \(y\) both contain only \(b\).
+In this case, \(uxz\) will have less \(b\)s than \(a\)s and \(c\)s.
+Therefore it isn't a member of \(L_{1/2}\).
+\item \(v\) contains \(a\) and \(y\) contains \(b\), or \(v\) contains \(b\) and \(y\) contains \(c\).
+In this both of these cases, \(uv^2xy^2z\) will have different number of \(a\) and \(c\).
+\end{itemize}
+\end{itemize}
+So we've shown that \(a^pb^pc^p\) cannot be pumped and reached a contradiction.
+Thus the mentioned rule does not hold.
+
+\subsection{}
+We first assume these languages are context free, then we prove that they can't be pumped.
+\subsubsection{}
+\begin{align*}
+L&=\left\{w\in \left\{a, b, c\right\}^*\mid n_a(w) < n_b(w) < n_c(w)\right\}
+\end{align*}
+Consider the string \(a^pb^{p+1}c^{p+2}\).
+\begin{align*}
+\exists u,v,x,y,z:
+\begin{cases}
+a^pb^{p+1}c^{p+2} = uvxyz&\\
+uv^ixy^iz\in L & i\ge 0\\
+\abs{vxy} \le p&\\
+\abs{vy} > 0&
+\end{cases}
+\end{align*}
+There are three cases for \(v\) and \(y\):
+\begin{itemize}
+\item Either \(v\) or \(y\) contains more than one type of symbol, the order of symbols in \(uv^2xy^2z\) will not be in the correct order.
+\item Both \(v\) and \(y\) have only one type of alphabet and both contain the same symbol.
+\begin{itemize}
+\item If both contain only \(a\), then the number of \(a\) symbols in \(uv^2xy^2z\), will be greater than or equal to number of \(b\) symbols.
+\item If both contain only \(b\), then the number of \(b\) symbols in \(uv^2xy^2z\), will be greater than or equal to number of \(c\) symbols.
+\item If both contain only \(c\), then the number of \(c\) symbols in \(uxz\), will be less than or equal to number of \(b\) symbols.
+\end{itemize}
+\item Both \(v\) and \(y\) have only one type of alphabet and contain different symbols.
+There can be two cases:
+\begin{itemize}
+\item \(v\) contains \(a\) and \(y\) contains \(b\).
+\begin{itemize}
+\item If \(y\) is not empty, then the number of \(b\) symbols in \(uv^2xy^2z\), will be greater than or equal to number of \(c\) symbols.
+\item If \(y\) is empty, then the number of \(a\) symbols in \(uv^2xy^2z\), will be greater than or equal to number of \(b\) symbols.
+\end{itemize}
+\item \(v\) contains \(b\) and \(y\) contains \(c\).
+\begin{itemize}
+\item If \(v\) is not empty, then the number of \(b\) symbols in \(uxz\) will be less than or equal to number of \(a\) symbols.
+\item If \(v\) is empty, then the number of \(c\) symbols in \(uxz\) will be less than or equal to number of \(b\) symbols.
+\end{itemize}
+\end{itemize}
+\end{itemize}
+So we've shown that \(a^pb^{p+1}c^{p+2}\) cannot be pumped and reached a contradiction.
+
+\subsubsection{}
+\begin{align*}
+L=\left\{w\in \{a, b\}^* \mid w=w^R, n_a(w)=n_b(w)\right\} 
+\end{align*}
+Consider the string \(s=a^pb^{2p}a^{p}\).
+\begin{align*}
+\exists u,v,x,y,z:
+\begin{cases}
+a^pb^{2p}a^{p} = uvxyz&\\
+uv^ixy^iz\in L & i\ge 0\\
+\abs{vxy} \le p&\\
+\abs{vy} > 0&
+\end{cases}
+\end{align*}
+\begin{itemize}
+\item If either \(v\) or \(y\) contains more than one type of symbol, the order of symbols in \(uv^2xy^2z\) will not be in the correct order.
+\item Both \(v\) and \(y\) have only one type of alphabet and both contain the same symbol.
+In this case \(uv^2xy^2z\), the number of \(a\) and \(b\)s will be different.
+\item \(v\) contains \(a\) and \(y\) contains \(b\) or vice versa.
+In this case, \(uv^2xy^2z\) will not be symmetric.
+\end{itemize}
+So we've shown that \(a^pb^{2p}a^{p}\) cannot be pumped and reached a contradiction.
+
+\subsubsection{}
+\begin{align*}
+L=\left\{a^ib^j\mid i=kj \text{ for some positive integer } k\right\}
+\end{align*}
+Consider the string \(s=a^{2p^2}b^{2p}\).
+As \(\abs{s}\) is greater than \(p\), it can be pumped:
+\begin{align*}
+\exists u,v,x,y,z:
+\begin{cases}
+a^{2p^2}b^{2p} = uvxyz&\\
+uv^ixy^iz\in L & i\ge 0\\
+\abs{vxy} \le p&\\
+\abs{vy} > 0&
+\end{cases}
+\end{align*}
+There are two cases for \(v\) and \(y\):
+\begin{itemize}
+\item Either \(v\) or \(y\) contains more than one type of symbol.
+In this case, the order of symbols in \(uv^2xy^2z\) will not be in the correct order.
+\item Both \(v\) and \(y\) have only one type of alphabet and both contain the same symbol.
+\begin{itemize}
+\item Both contain \(a\).
+Suppose \(\abs{vy}=n\).
+We have:
+\begin{align*}
+\forall i:\ &2p\mid 2p^2 + (i-1)n\\
+\implies \forall i:\ &2p\mid (i-1)n\\
+\implies &2p\mid n\\
+\implies &n \ge 2p
+\end{align*}
+Which is a contradiction.
+Because we know \(n=\abs{vy}\le \abs{vxy} \le  p\).
+\item Both contain \(b\).
+In this case we can find a \(i\) large enough such that \(uv^ixy^iz\) contains more \(b\)s than \(a\)s.
+\item \(v\) contains \(a\) and \(y\) contains \(b\).
+Assume \(\abs{v}=n\) and \(\abs{y}=m\). We have:
+\begin{align*}
+\forall i:\ &2p+(i-1)m\mid 2p^2 + (i-1)n\\
+\implies \forall i:\ &2p+(i-1)m\mid (i-1) (n-pm)\\
+\implies &n-pm = 0\\
+\implies &n = pm\\
+\implies &\abs{vy} = (p+1)m > p
+\end{align*}
+Which is again, a contradiction because we know \(\abs{vy} \le p\).
+\end{itemize}
+\end{itemize}
+So we've shown that \(a^{2p^2}b^{2p}\) cannot be pumped and reached a contradiction.
+
+
+
+\end{document}
